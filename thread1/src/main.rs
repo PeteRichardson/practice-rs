@@ -1,15 +1,24 @@
-use std::thread;
-
-fn f() {
-    println!("Hello from thread id {:?}", thread::current().id());
+use log::{debug, info};
+use std::thread::{self, ThreadId};
+fn enumerated_squares(x: u32) -> (ThreadId, u32) {
+    let id = thread::current().id();
+    info!("Hello from thread id {:?}.   {}^2 = {}", id, x, x * x);
+    (id, x * x)
 }
 
 fn main() {
-    let t1 = thread::spawn(f);
-    let t2 = thread::spawn(f);
+    env_logger::init();
+    let a = 5;
+    let b = 7;
+    let t1 = thread::spawn(move || enumerated_squares(a));
+    let t2 = thread::spawn(move || enumerated_squares(b));
 
-    println!("Hello from the main thread!");
+    debug!("Hello from the main thread!");
 
-    t1.join().unwrap();
-    t2.join().unwrap();
+    let (i1, r1) = t1.join().unwrap();
+    let (i2, r2) = t2.join().unwrap();
+
+    debug!("ids = {:?}, {:?}", i1, i2);
+    info!("squares = {}, {}", r1, r2);
+    println!("Sum of squares = {}", r1 + r2);
 }
