@@ -1,5 +1,4 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
+use clap::Parser;
 use log::{debug, info};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -11,16 +10,21 @@ fn count_lines(path: &str) -> Result<usize, std::io::Error> {
     let count = lines.try_fold(0, |acc, line| line.map(|_| acc + 1))?;
     Ok(count)
 }
+#[derive(Parser, Debug)]
+struct Args {
+    paths: Vec<String>,
+}
 
 fn main() {
     env_logger::init();
-    debug!("Main thread starting");
 
-    let paths: Vec<&str> = vec!["data/target.txt", "src/main.rs"];
+    let args = Args::parse();
+
+    debug!("Main thread starting");
     let mut threads: Vec<JoinHandle<()>> = vec![];
-    for path in paths {
+    for path in args.paths {
         threads.push(thread::spawn(move || {
-            let count: usize = count_lines(path).expect("Couldn't count lines!");
+            let count: usize = count_lines(&path).expect("Couldn't count lines!");
             println!("{} - {} lines", path, count);
         }))
     }
