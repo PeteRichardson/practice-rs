@@ -1,24 +1,42 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 use log::{debug, info};
-use std::thread::{self, ThreadId};
-fn enumerated_squares(x: u32) -> (ThreadId, u32) {
-    let id = thread::current().id();
-    info!("Hello from thread id {:?}.   {}^2 = {}", id, x, x * x);
-    (id, x * x)
+use std::fs::File;
+use std::io::{BufRead, BufReader};
+use std::thread::{self, JoinHandle};
+
+fn count_lines(path: &str) -> Result<usize, std::io::Error> {
+    info!("{:?}: counting '{}'", thread::current().id(), path);
+    let mut lines = BufReader::new(File::open(&path)?).lines();
+    let count = lines.try_fold(0, |acc, line| line.map(|_| acc + 1))?;
+    Ok(count)
 }
 
 fn main() {
     env_logger::init();
-    let a = 5;
-    let b = 7;
-    let t1 = thread::spawn(move || enumerated_squares(a));
-    let t2 = thread::spawn(move || enumerated_squares(b));
+    debug!("Main thread starting");
 
-    debug!("Hello from the main thread!");
+    let paths: Vec<&str> = vec!["data/target.txt", "src/main.rs"];
+    let mut threads: Vec<JoinHandle<()>> = vec![];
+    for path in paths {
+        threads.push(thread::spawn(move || {
+            let count: usize = count_lines(path).expect("Couldn't count lines!");
+            println!("{} - {} lines", path, count);
+        }))
+    }
 
-    let (i1, r1) = t1.join().unwrap();
-    let (i2, r2) = t2.join().unwrap();
+    for t in threads {
+        t.join().unwrap()
+    }
+    debug!("Main thread ending");
+}
 
-    debug!("ids = {:?}, {:?}", i1, i2);
-    info!("squares = {}, {}", r1, r2);
-    println!("Sum of squares = {}", r1 + r2);
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_count_lines() {
+        assert_eq!(count_lines("data/target.txt").unwrap(), 6);
+    }
 }

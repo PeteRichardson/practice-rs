@@ -6,3 +6,12 @@ edition = "2021"
 [dependencies]
 env_logger = "0.11.3"
 log = "0.4.21"
+
+[package.metadata.scripts]
+run = "cargo run"
+runq = "clear && cargo run -q -- foo.txt"
+rund = "clear && RUST_LOG=debug cargo run -q -- foo.txt"
+test = "cargo test"
+check = "cargo check"
+build = "cargo build"
+release = "cargo build --release"
