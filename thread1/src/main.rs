@@ -6,7 +6,7 @@ use std::thread::{self, JoinHandle};
 
 fn count_lines(path: &str) -> Result<usize, std::io::Error> {
     info!("{:?}: counting '{}'", thread::current().id(), path);
-    let mut lines = BufReader::new(File::open(&path)?).lines();
+    let mut lines = BufReader::new(File::open(path)?).lines();
     let count = lines.try_fold(0, |acc, line| line.map(|_| acc + 1))?;
     Ok(count)
 }
