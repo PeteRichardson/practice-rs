@@ -39,7 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             match entry {
                 Ok(path) => threads.push(thread::spawn(move || {
                     let count: usize = count_lines(&path).expect("Couldn't count lines!");
-                    println!("{} - {} lines", path.display(), count);
+                    println!("{:8} {}", count, path.display());
                 })),
                 Err(e) => println!("{:?}", e),
             }
