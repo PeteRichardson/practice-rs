@@ -1,4 +1,4 @@
 [workspace]
 resolver = "2"
 
-members = ["byte", "thread1"]
+members = ["byte", "memmap", "thread1"]
