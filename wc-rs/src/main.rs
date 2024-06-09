@@ -4,7 +4,7 @@ use log::debug;
 use std::fs::File;
 use std::io::BufRead;
 use std::path::Path;
-use std::thread::{self, JoinHandle};
+use threadpool::ThreadPool;
 
 use memmap2::Mmap;
 
@@ -30,24 +30,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
 
     let args = Args::parse();
-    let mut threads: Vec<JoinHandle<()>> = vec![];
+    let pool = ThreadPool::new(16);
 
     for pattern in args.filename_patterns {
         debug!("# handling pattern '{}'", &pattern);
         for entry in glob(&pattern)? {
             debug!("# handling entry '{:?}'", &entry);
             match entry {
-                Ok(path) => threads.push(thread::spawn(move || {
+                Ok(path) => pool.execute(move || {
                     let count: usize = count_lines(&path).expect("Couldn't count lines!");
                     println!("{:8} {}", count, path.display());
-                })),
+                }),
                 Err(e) => println!("{:?}", e),
             }
         }
     }
-    for t in threads {
-        t.join().unwrap()
-    }
+    pool.join();
 
     Ok(())
 }
