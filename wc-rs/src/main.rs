@@ -3,7 +3,7 @@ use glob::glob;
 use log::debug;
 use std::fs::File;
 use std::io::BufRead;
-use std::path::PathBuf;
+use std::path::Path;
 use std::thread::{self, JoinHandle};
 
 use memmap2::Mmap;
@@ -18,7 +18,7 @@ struct Args {
 /// 1. memory mapping file
 /// 2. calling lines() on the whole slice
 /// 3. iterating and accumulating the count
-fn count_lines(path: &PathBuf) -> Result<usize, Box<dyn std::error::Error>> {
+fn count_lines(path: &Path) -> Result<usize, Box<dyn std::error::Error>> {
     let file = File::open(path)?;
     let mmap = unsafe { Mmap::map(&file)? };
     let mut lines = mmap[..].lines();
@@ -50,4 +50,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_count_lines() {
+        assert_eq!(
+            count_lines("data/AliceInWonderland.txt".as_ref()).unwrap(),
+            24
+        );
+    }
 }
