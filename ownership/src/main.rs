@@ -6,7 +6,13 @@ fn append_s(s: &mut String) {
 }
 
 fn main() {
-    let mut s0 = String::from("Hello"); // s0's scope begins. It's a mutable string
-    append_s(&mut s0);
-    println!("s0: {}", s0);
+    let mut strings = [
+        "Pete".to_string(),
+        "Wendy".to_string(),
+        "Kat".to_string(),
+    ];
+    strings.iter_mut().for_each(|s| { 
+        append_s(s);
+        println!("s: {}", s)
+    });
 }
