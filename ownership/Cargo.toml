@@ -4,3 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+[package.metadata.scripts]
+run = "cargo run"
+watch = "cargo watch -cqx 'run -q'"
+runq = "clear ; cargo run -q"
+rund = "clear ; env RUST_LOG=debug cargo run -q"
+test = "cargo test"
+check = "cargo check"
+build = "cargo build"
+release = "cargo build --release"
