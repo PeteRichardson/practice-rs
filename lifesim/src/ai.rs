@@ -13,3 +13,12 @@ impl Living for AI {
         println!("{} is running version {}!", self.model, self.version);
     }
 }
+
+impl AI {
+    pub fn create(model: &str, version: &str) -> Box<dyn Living> {
+        Box::new(AI {
+            model: model.into(),
+            version: version.into(),
+        })
+    }
+}

@@ -16,3 +16,12 @@ impl Living for Person {
         println!("{} is {} years old!", self.name, self.age);
     }
 }
+
+impl Person {
+    pub fn create(name: &str, age: u32) -> Box<dyn Living> {
+        Box::new(Person {
+            name: name.into(),
+            age,
+        })
+    }
+}
