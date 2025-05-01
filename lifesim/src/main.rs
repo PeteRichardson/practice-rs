@@ -7,13 +7,12 @@ use ai::AI;
 use person::Person;
 
 fn main() {
+    let living_things = vec![Person::create("Pete", 59), AI::create("GPT-3", "3.5")];
+
     let world = world::World {
         name: String::from("My World"),
-        inhabitants: vec![Person::create("Pete", 59), AI::create("GPT-3", "3.5")],
+        inhabitants: living_things,
     };
     println!("World Name: {}", world.name);
-    for mut entity in world.inhabitants {
-        entity.live();
-        entity.die();
-    }
+    world.run();
 }
