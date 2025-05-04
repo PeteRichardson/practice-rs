@@ -15,7 +15,7 @@ impl Living for AI {
 }
 
 impl AI {
-    pub fn create(model: &str, version: &str) -> Box<dyn Living> {
+    pub fn new(model: &str, version: &str) -> Box<dyn Living> {
         Box::new(AI {
             model: model.into(),
             version: version.into(),

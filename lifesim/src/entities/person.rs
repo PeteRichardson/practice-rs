@@ -18,7 +18,7 @@ impl Living for Person {
 }
 
 impl Person {
-    pub fn create(name: &str, age: u32) -> Box<dyn Living> {
+    pub fn new(name: &str, age: u32) -> Box<dyn Living> {
         Box::new(Person {
             name: name.into(),
             age,
