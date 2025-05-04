@@ -1,11 +1,11 @@
 use crate::entities::Living;
 
-pub struct World {
+pub struct World<'a> {
     pub name: String,
-    pub inhabitants: Vec<Box<dyn Living>>,
+    pub inhabitants: Vec<Box<dyn Living + 'a>>,
 }
 
-impl World {
+impl<'a> World<'a> {
     pub fn run(&mut self) {
         for inhabitant in &mut self.inhabitants {
             inhabitant.live();
@@ -13,7 +13,7 @@ impl World {
         }
     }
 
-    pub fn new<S: Into<String>>(name: S, inhabitants: Vec<Box<dyn Living>>) -> Self {
+    pub fn new<S: Into<String>>(name: S, inhabitants: Vec<Box<dyn Living + 'a>>) -> Self {
         let world_name = name.into();
         println!("World: {}", world_name);
         World {
@@ -22,7 +22,7 @@ impl World {
         }
     }
 
-    pub fn add_inhabitant(&mut self, inhabitant: impl Living + 'static) {
+    pub fn add_inhabitant(&mut self, inhabitant: impl Living + 'a) {
         self.inhabitants.push(Box::new(inhabitant));
     }
 }

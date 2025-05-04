@@ -17,6 +17,15 @@ impl Living for Person {
     }
 }
 
+impl<'a> Living for &'a mut Person {
+    fn name(&self) -> &str {
+        (*self).name.as_str()
+    }
+    fn live(&mut self) {
+        (*self).live();
+    }
+}
+
 impl Person {
     pub fn new(name: &str, age: u32) -> Person {
         Person {
