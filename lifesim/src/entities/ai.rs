@@ -15,10 +15,10 @@ impl Living for AI {
 }
 
 impl AI {
-    pub fn new(model: &str, version: &str) -> Box<dyn Living> {
-        Box::new(AI {
+    pub fn new<S: Into<String>>(model: S, version: S) -> Self {
+        AI {
             model: model.into(),
             version: version.into(),
-        })
+        }
     }
 }

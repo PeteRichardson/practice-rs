@@ -22,7 +22,7 @@ impl World {
         }
     }
 
-    pub fn add_inhabitant(&mut self, inhabitant: Box<dyn Living>) {
-        self.inhabitants.push(inhabitant);
+    pub fn add_inhabitant(&mut self, inhabitant: impl Living + 'static) {
+        self.inhabitants.push(Box::new(inhabitant));
     }
 }
