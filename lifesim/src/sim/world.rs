@@ -1,4 +1,4 @@
-use crate::living::Living;
+use crate::entities::Living;
 
 pub struct World {
     pub name: String,
@@ -7,7 +7,7 @@ pub struct World {
 
 impl World {
     pub fn run(&mut self) {
-        for mut inhabitant in self.inhabitants {
+        for inhabitant in &mut self.inhabitants {
             inhabitant.live();
             inhabitant.die();
         }

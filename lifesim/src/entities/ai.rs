@@ -1,4 +1,4 @@
-use crate::living::Living;
+use crate::entities::Living;
 pub struct AI {
     pub model: String,
     pub version: String,

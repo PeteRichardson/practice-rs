@@ -1,4 +1,4 @@
-use crate::living::Living;
+use crate::entities::Living;
 use rand;
 pub struct Person {
     pub name: String,
