@@ -1,5 +1,6 @@
 use crate::entities::Living;
 use rand;
+
 pub struct Person {
     pub name: String,
     pub age: u32,
@@ -17,20 +18,35 @@ impl Living for Person {
     }
 }
 
-impl<'a> Living for &'a mut Person {
-    fn name(&self) -> &str {
-        (*self).name.as_str()
-    }
-    fn live(&mut self) {
-        (*self).live();
-    }
-}
-
 impl Person {
     pub fn new(name: &str, age: u32) -> Person {
         Person {
             name: name.into(),
             age,
         }
+    }
+}
+
+impl Clone for Person {
+    fn clone(&self) -> Self {
+        println!(
+            "CLONED {} at {:?}",
+            self.name,
+            std::panic::Location::caller()
+        );
+        Person {
+            name: self.name.clone(),
+            age: self.age,
+        }
+    }
+}
+
+impl Drop for Person {
+    fn drop(&mut self) {
+        println!(
+            "DROPPED {} at {:?}",
+            self.name,
+            std::panic::Location::caller()
+        );
     }
 }

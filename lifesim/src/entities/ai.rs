@@ -14,16 +14,8 @@ impl Living for AI {
     }
 }
 
-impl Living for &mut AI {
-    fn name(&self) -> &str {
-        (*self).model.as_str()
-    }
-    fn live(&mut self) {
-        (*self).live();
-    }
-}
-
 impl AI {
+    // constructor that accepts any string-like types
     pub fn new<S: Into<String>>(model: S, version: S) -> Self {
         AI {
             model: model.into(),
