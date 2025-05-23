@@ -5,6 +5,7 @@ members = [
     "byte",
     "command",
     "multitype",
+    "lifesim",
     "wc-rs",
     "lc",
     "split",
