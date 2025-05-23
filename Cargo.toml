@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "byte",
+    "command",
+    "multitype",
+    "wc-rs",
+    "thread1",
+    "split",
+    "simplematch",
+    "ownership",
+]

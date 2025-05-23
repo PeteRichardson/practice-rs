@@ -1,4 +1,0 @@
-[workspace]
-resolver = "2"
-
-members = ["byte", "multitype", "wc-rs", "thread1", "split", "simplematch", "ownership"]
