@@ -6,7 +6,7 @@ members = [
     "command",
     "multitype",
     "wc-rs",
-    "thread1",
+    "lc",
     "split",
     "simplematch",
     "ownership",
