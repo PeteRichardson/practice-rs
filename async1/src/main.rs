@@ -1,7 +1,9 @@
+use async_lock::Semaphore; // ✅ Correct, async-std-compatible Semaphore!
 use async_std::fs;
 use async_std::path::PathBuf;
 use async_std::stream::StreamExt;
 use async_std::task::{self, JoinHandle};
+use git2::Repository;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::{Arc, Mutex};
@@ -9,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use anyhow::{Context, Result};
 use clap::Parser;
 
-/// Walk a directory tree asynchronously.
+/// Walk a directory tree asynchronously with bounded concurrency.
 #[derive(Parser)]
 struct Args {
     /// Directory to start walking from (default: ".")
@@ -26,12 +28,25 @@ async fn main() -> Result<()> {
     let current_count = Arc::new(Mutex::new(0));
     let max_count = Arc::new(Mutex::new(0));
 
+    // Concurrency limiter to avoid "Too Many Open Files"
+    let concurrency_limit = 100; // adjust based on your system
+    let semaphore = Arc::new(Semaphore::new(concurrency_limit));
+
     let tasks_clone = tasks.clone();
     let current_clone = current_count.clone();
     let max_clone = max_count.clone();
+    let semaphore_clone = semaphore.clone();
 
     let initial_task = task::spawn(async move {
-        if let Err(e) = walk_dir(root_dir, tasks_clone, current_clone, max_clone).await {
+        if let Err(e) = walk_dir(
+            root_dir,
+            tasks_clone,
+            current_clone,
+            max_clone,
+            semaphore_clone,
+        )
+        .await
+        {
             eprintln!("Error in root: {:?}", e);
         }
     });
@@ -59,15 +74,26 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+fn is_git_repo(path: &PathBuf) -> bool {
+    match Repository::open(path) {
+        Ok(_) => true,
+        Err(_) => false,
+    }
+}
+
 fn walk_dir(
     dir: PathBuf,
     tasks: Arc<Mutex<Vec<JoinHandle<()>>>>,
     current_count: Arc<Mutex<usize>>,
     max_count: Arc<Mutex<usize>>,
+    semaphore: Arc<Semaphore>,
 ) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> {
     Box::pin(async move {
+        // 🚦 Acquire a permit to limit concurrency
+        let _permit = semaphore.acquire().await;
+
         // Increment active count
-        let current = {
+        let _current = {
             let mut current_locked = current_count.lock().unwrap();
             *current_locked += 1;
 
@@ -79,7 +105,7 @@ fn walk_dir(
 
             *current_locked
         };
-        println!("Task started. Current active: {}", current);
+        //println!("Task started. Current active: {}", current);
 
         let mut entries = fs::read_dir(&dir)
             .await
@@ -98,30 +124,42 @@ fn walk_dir(
                 .with_context(|| format!("Failed to get file type for {}", path.display()))?;
 
             if file_type.is_dir() {
-                let tasks_clone = tasks.clone();
-                let current_clone = current_count.clone();
-                let max_clone = max_count.clone();
-                let path_clone = path.clone();
-                let new_task = task::spawn(async move {
-                    if let Err(e) =
-                        walk_dir(path_clone, tasks_clone, current_clone, max_clone).await
-                    {
-                        eprintln!("Error in {}: {:?}", path.display(), e);
-                    }
-                });
-                tasks.lock().unwrap().push(new_task);
-            } else if file_type.is_file() {
-                println!("File: {}", path.display());
+                if is_git_repo(&path) {
+                    println!("found a git repo: {}", path.display());
+                } else {
+                    let tasks_clone = tasks.clone();
+                    let current_clone = current_count.clone();
+                    let max_clone = max_count.clone();
+                    let semaphore_clone = semaphore.clone();
+                    let path_clone = path.clone();
+                    let new_task = task::spawn(async move {
+                        if let Err(e) = walk_dir(
+                            path_clone,
+                            tasks_clone,
+                            current_clone,
+                            max_clone,
+                            semaphore_clone,
+                        )
+                        .await
+                        {
+                            eprintln!("Error in {}: {:?}", path.display(), e);
+                        }
+                    });
+                    tasks.lock().unwrap().push(new_task);
+                }
             }
+            //  else if file_type.is_file() {
+            //     println!("File: {}", path.display());
+            // }
         }
 
         // Decrement active count
-        let current = {
+        let _current = {
             let mut locked = current_count.lock().unwrap();
             *locked -= 1;
             *locked
         };
-        println!("Task finished. Current active: {}", current);
+        // println!("Task finished. Current active: {}", current);
 
         Ok(())
     })
