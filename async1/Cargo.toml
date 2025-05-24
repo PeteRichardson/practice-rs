@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 async-std = { version = "1.13.1", features = ["attributes"] }
+clap = { version = "4.5.38", features = ["derive"] }
