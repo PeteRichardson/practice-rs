@@ -2,13 +2,14 @@
 resolver = "2"
 
 members = [
+    "async1",
     "byte",
     "command",
-    "multitype",
-    "lifesim",
-    "wc-rs",
     "lc",
-    "split",
-    "simplematch",
+    "lifesim",
+    "multitype",
     "ownership",
+    "simplematch",
+    "split",
+    "wc-rs",
 ]
