@@ -5,6 +5,7 @@ members = [
     "async1",
     "byte",
     "command",
+    "filter",
     "lc",
     "lifesim",
     "multitype",
