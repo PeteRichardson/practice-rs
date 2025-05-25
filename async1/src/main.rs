@@ -75,10 +75,7 @@ async fn main() -> Result<()> {
 }
 
 fn is_git_repo(path: &PathBuf) -> bool {
-    match Repository::open(path) {
-        Ok(_) => true,
-        Err(_) => false,
-    }
+    Repository::open(path).is_ok()
 }
 
 fn walk_dir(
