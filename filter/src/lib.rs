@@ -4,18 +4,20 @@ use git2::Repository;
 use std::collections::HashSet;
 use std::path::Path;
 
-trait Filter<T: ?Sized> {
+pub trait Filter<T: ?Sized> {
+    // ?Sized is needed to relax the usual Sized requirement on Trait params
+    // since we'll be filtering Paths (which are not Sized)
     fn filter(&self, t: &T) -> bool;
 }
 
-// AddToGithub - Filter that keeps paths to directories
+// AddToGithub - Filter that allows paths to directories
 // containing git repos that haven't yet been uploaded
-struct AddToGithub {
+pub struct AddToGithub {
     bad_path_components: HashSet<String>,
 }
 
 impl AddToGithub {
-    fn new<S: AsRef<str>>(list: &[S]) -> Self {
+    pub fn new<S: AsRef<str>>(list: &[S]) -> Self {
         let bad_path_components = list.iter().map(|s| s.as_ref().to_owned()).collect();
         AddToGithub {
             bad_path_components,
@@ -56,16 +58,14 @@ impl Filter<Path> for AddToGithub {
     }
 }
 
-fn main() {
-    let filter_dir = AddToGithub::new::<&str>(&[]);
-
-    let dir = Path::new("/Users/pete/practice/rust/size/");
-    if filter_dir.filter(&dir) {
-        println!("{} should be uploaded", dir.display());
-    } else {
-        println!("{} should not be uploaded", dir.display());
-    }
-}
+// NOTE: the tests below depend on some specific folders and git repos
+//       on my system.  e.g. /Users/pete/practice/rust/size is a repo
+//       but has never been uploaded to github, so for the purposes
+//       of this filter, the expected output is true.  i.e. it is
+//       a dir, doesn't contain bad components, contains a git repo
+//       and doesn't have an 'origin' remote
+// TODO: Change these tests to dynamically generate the necessary test
+//       repos at test setup time if they don't exist already.
 
 #[cfg(test)]
 mod tests {
