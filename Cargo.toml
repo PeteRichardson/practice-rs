@@ -11,6 +11,6 @@ members = [
     "multitype",
     "ownership",
     "simplematch",
-    "split",
+    "split", "stringmanip",
     "wc-rs",
 ]
