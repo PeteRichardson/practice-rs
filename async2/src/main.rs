@@ -2,8 +2,15 @@
 // TODO: add options (pattern and files to search) using clap
 // TODO: add logging
 
+use clap::Parser;
 use tokio::fs::File;
 use tokio::io::{self, AsyncBufReadExt, BufReader};
+
+#[derive(Parser)]
+struct Args {
+    pattern: String,
+    files: Vec<String>,
+}
 
 async fn search_file(pattern: &str, path: &str) -> Result<Vec<String>, &'static str> {
     let file = File::open(path).await.map_err(|_| "Could not open file!")?;
@@ -30,12 +37,14 @@ async fn dump_lines(lines: Vec<String>) {
 
 #[tokio::main]
 async fn main() -> Result<(), io::Error> {
-    let pattern = "CRITICAL";
-    let path = "/Users/pete/data/afewlogs/0a7e2adc-8bda-443d-a814-60185c7b1c96.log";
-    let critical_lines = search_file(pattern, path).await.unwrap();
+    let args = Args::parse();
 
-    println!("# searching for {} in {}", pattern, path);
-    dump_lines(critical_lines).await;
+    let pattern = args.pattern;
+    for file in args.files {
+        let critical_lines = search_file(&pattern, &file).await.unwrap();
+        println!("# searching for {} in {}", pattern, file);
+        dump_lines(critical_lines).await;
+    }
 
     Ok(())
 }
