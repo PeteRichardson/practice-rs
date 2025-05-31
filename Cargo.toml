@@ -2,7 +2,7 @@
 resolver = "2"
 
 members = [
-    "async1",
+    "async1", "async2",
     "byte",
     "command",
     "filter",
