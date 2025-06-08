@@ -2,15 +2,18 @@
 resolver = "2"
 
 members = [
-    "async1", "async2",
+    "async1",
+    "async2",
     "byte",
     "command",
+    "repl",
     "filter",
     "lc",
     "lifesim",
     "multitype",
     "ownership",
     "simplematch",
-    "split", "stringmanip",
+    "split",
+    "stringmanip",
     "wc-rs",
 ]
