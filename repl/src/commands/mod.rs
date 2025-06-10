@@ -34,6 +34,8 @@ impl Command {
 
         match cmd.as_str() {
             "exit" => Command::Exit(ExitCmd),
+            "quit" => Command::Exit(ExitCmd),
+            "q" => Command::Exit(ExitCmd),
             "greet" => Command::Greet(GreetCmd::new(args)),
             _ => Command::Unknown(UnknownCmd),
         }
