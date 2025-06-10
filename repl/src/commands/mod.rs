@@ -18,13 +18,13 @@ pub enum Command {
 }
 
 impl Command {
-    // Will use name() later when logging
-    // pub fn name(&self) -> &'static str {
-    //     match self {
-    //         Command::Exit(_) => "exit",
-    //         Command::Unknown(_) => "unknown",
-    //     }
-    // }
+    pub fn name(&self) -> &'static str {
+        match self {
+            Command::Exit(_) => "exit",
+            Command::Greet(_) => "greet",
+            Command::Unknown(_) => "unknown",
+        }
+    }
 
     pub fn parse(line: &str) -> Self {
         let trimmed = line.trim();
