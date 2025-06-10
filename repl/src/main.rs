@@ -1,15 +1,8 @@
-use repl::{Command, ExitCmd, Runnable, UnknownCmd};
+mod commands;
+use commands::{Command, Runnable};
 use rustyline::config::{Config, EditMode};
 use rustyline::{DefaultEditor, Result};
 use std::process::ExitCode;
-
-fn parse(line: &str) -> Command {
-    if line.starts_with("exit") {
-        Command::Exit(ExitCmd)
-    } else {
-        Command::Unknown(UnknownCmd)
-    }
-}
 
 fn main() -> Result<ExitCode> {
     println!("# simple repl  (only valid command is 'exit')");
@@ -22,7 +15,7 @@ fn main() -> Result<ExitCode> {
         let readline = rl.readline(">> ");
         match readline {
             Ok(line) => {
-                let cmd = parse(&line);
+                let cmd = Command::parse(&line);
                 let _ = cmd.run();
                 if matches!(cmd, Command::Exit(_)) {
                     break;
