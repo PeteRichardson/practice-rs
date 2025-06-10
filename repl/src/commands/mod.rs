@@ -33,9 +33,7 @@ impl Command {
         let args = tokens.collect::<Vec<_>>().join(" ");
 
         match cmd.as_str() {
-            "exit" => Command::Exit(ExitCmd),
-            "quit" => Command::Exit(ExitCmd),
-            "q" => Command::Exit(ExitCmd),
+            "exit" | "quit" | "q" => Command::Exit(ExitCmd),
             "greet" => Command::Greet(GreetCmd::new(args)),
             _ => Command::Unknown(UnknownCmd),
         }
